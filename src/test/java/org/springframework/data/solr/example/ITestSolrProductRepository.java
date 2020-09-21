@@ -2,6 +2,9 @@ package org.springframework.data.solr.example;
 
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.SolrParams;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +29,7 @@ public class ITestSolrProductRepository extends AbstractSolrIntegrationTest {
 
 	@After
 	public void tearDown() {
-		repo.deleteAll();
+	//	repo.deleteAll();
 	}
 	
 	@Test
@@ -88,7 +91,6 @@ public class ITestSolrProductRepository extends AbstractSolrIntegrationTest {
 	public void testFilterQuery() {
 		List<Product> baseList = createProductList(10);
 		repo.save(baseList);
-
 		Page<Product> availableProducts = repo.findByAvailableTrue();
 		Assert.assertEquals(5, availableProducts.getTotalElements());
 		for (Product product : availableProducts) {
@@ -96,4 +98,13 @@ public class ITestSolrProductRepository extends AbstractSolrIntegrationTest {
 		}
 	}
 
+	@Test
+	public void testQueryPrices() throws SolrServerException {
+		List<Product> baseList = createProductList(10);
+		repo.save(baseList);
+		int value1=0;
+		int value2=200;
+		SolrDocumentList availableProducts = repo.findBySpecificQuery(value1, value2);
+		Assert.assertEquals(3, availableProducts.size());
+	}
 }

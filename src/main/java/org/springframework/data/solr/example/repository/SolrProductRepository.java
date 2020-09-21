@@ -1,5 +1,9 @@
 package org.springframework.data.solr.example.repository;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.solr.core.query.Criteria;
@@ -36,5 +40,16 @@ public class SolrProductRepository extends SimpleSolrRepository<Product, String>
 		query.addFilterQuery(new SimpleQuery(new Criteria(SolrSearchableFields.AVAILABLE).is(true)));
 
 		return getSolrOperations().queryForPage(query, Product.class);
+	}
+	
+	@Override
+	public SolrDocumentList findBySpecificQuery(int value1, int value2) throws SolrServerException {
+		String fields = Product.ID_FIELD + " " + Product.NAME_FIELD;
+		String PRICESQUERY = "price:[%s TO %s]";
+	    String specificQuery = String.format(PRICESQUERY, value1, value2);
+
+	    SolrQuery query = new SolrQuery();
+	    query.set("q", specificQuery);
+		return getSolrOperations().getSolrServer().query(query).getResults();
 	}
 }
